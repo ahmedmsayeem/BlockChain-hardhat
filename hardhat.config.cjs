@@ -1,5 +1,5 @@
-import('@nomicfoundation/hardhat-toolbox');
+require('@nomicfoundation/hardhat-toolbox')
 
-export default {
+module.exports= {
   solidity: '0.8.20',
 };
