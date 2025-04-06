@@ -36,11 +36,11 @@ bunx hardhat ignition deploy ignition/modules/logger.js --network localhost
 ```
 
 # frontend
-copy artifacts/contracts/DBLogger.json into SRC
+1. copy artifacts/contracts/DBLogger.json into SRC
 
-edit private_key,ADDRESS and nide url in component and scripts under ./scripts
+2. edit private_key,ADDRESS and nide url in component and scripts under ./scripts
 
-bun i , bun start
+3. bun i , bun start
 
 # Db manipulation - refer ./scripts 
 
