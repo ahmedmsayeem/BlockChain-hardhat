@@ -1,0 +1,16 @@
+{
+  "name": "blockchain",
+  "module": "index.ts",
+  "type": "commonjs",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/bun": "latest",
+    "hardhat": "^2.22.19"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "ethers": "^6.13.5"
+  }
+}
