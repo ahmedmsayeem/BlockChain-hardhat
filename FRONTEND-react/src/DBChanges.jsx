@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import LoggerABI from "./DBLogger.json"; // Update path if needed
 
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Replace with actual address if different
+const CONTRACT_ADDRESS =  "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Replace with actual address if different
 
 // Styles
 const styles = {

@@ -25,6 +25,7 @@ cd <your-project>
 # 2. Install dependencies
 bun install
 
+./setup.sh or do the following
 # 3. Compile the smart contract
 bunx hardhat compile
 
@@ -36,7 +37,7 @@ bunx hardhat ignition deploy ignition/modules/logger.js --network localhost
 ```
 
 # frontend
-1. copy artifacts/contracts/DBLogger.json into SRC
+1. copy artifacts/contracts/DBLogger.json into SRC - ./setup.sh
 
 2. edit private_key,ADDRESS and nide url in component and scripts under ./scripts
 

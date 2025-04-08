@@ -8,13 +8,15 @@ function DBView() {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
 
+  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:4000";
+
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/users");
+      const response = await axios.get(`${apiUrl}/users`);
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -23,7 +25,7 @@ function DBView() {
 
   const createUser = async () => {
     try {
-      await axios.post("http://localhost:4000/users", { name, email });
+      await axios.post(`${apiUrl}/users`, { name, email });
       setName("");
       setEmail("");
       fetchUsers();
@@ -36,7 +38,7 @@ function DBView() {
   const updateUser = async () => {
     if (!selectedUserId) return;
     try {
-      await axios.put(`http://localhost:4000/users/${selectedUserId}`, {
+      await axios.put(`${apiUrl}/users/${selectedUserId}`, {
         name,
         email,
       });
@@ -53,7 +55,7 @@ function DBView() {
 
   const deleteUser = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/users/${id}`);
+      await axios.delete(`${apiUrl}/users/${id}`);
       fetchUsers();
       window.location.reload(); // Refresh the page
     } catch (error) {
