@@ -23,22 +23,34 @@ function DBView() {
     }
   };
 
-  const createUser = async () => {
-    try {
-      if (window.ethereum) {
+  const getMetaMaskAccount = async () => {
+    if (window.ethereum) {
+      try {
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         if (accounts && accounts.length > 0) {
           console.log("MetaMask Account:", accounts[0]);
           alert(`MetaMask Account: ${accounts[0]}`);
-          window.location.reload(); // Refresh the page
+          window.location.reload();
+          return accounts[0];
         } else {
           alert("No accounts found in MetaMask.");
-          return;
+          return null;
         }
-      } else {
-        alert("MetaMask is not installed.");
-        return;
+      } catch (error) {
+        console.error("Error fetching MetaMask account:", error);
+        alert("Failed to fetch MetaMask account. Check the console for details.");
+        return null;
       }
+    } else {
+      alert("MetaMask is not installed.");
+      return null;
+    }
+  };
+
+  const createUser = async () => {
+    try {
+      const account = await getMetaMaskAccount();
+      if (!account) return;
 
       await axios.post(`${apiUrl}/users`, { name, email });
       setName("");
@@ -53,10 +65,10 @@ function DBView() {
   const updateUser = async () => {
     if (!selectedUserId) return;
     try {
-      await axios.put(`${apiUrl}/users/${selectedUserId}`, {
-        name,
-        email,
-      });
+      const account = await getMetaMaskAccount();
+      if (!account) return;
+
+      await axios.put(`${apiUrl}/users/${selectedUserId}`, { name, email });
       setName("");
       setEmail("");
       setSelectedUserId(null);
@@ -70,6 +82,9 @@ function DBView() {
 
   const deleteUser = async (id) => {
     try {
+      const account = await getMetaMaskAccount();
+      if (!account) return;
+
       await axios.delete(`${apiUrl}/users/${id}`);
       fetchUsers();
       window.location.reload(); // Refresh the page
