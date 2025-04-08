@@ -11,3 +11,6 @@ bunx hardhat compile
 
 # Deploy the contract using Hardhat Ignition
 bunx hardhat ignition deploy ignition/modules/logger.js --network localhost
+
+# Copy the content of DBLogger.json to the React frontend directory
+cp artifacts/contracts/DBLogger.sol/DBLogger.json FRONTEND-react/src/DBLogger.json

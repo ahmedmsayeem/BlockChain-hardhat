@@ -104,6 +104,13 @@ export default function DBChangeLogs() {
           const rowId = log.args[2];
           const dataHash = log.args[3];
           const data = log.args[4];
+          const unixTime = log.args[5].toString(); // Convert BigNumber to string
+          let dateObj = new Date(unixTime * 1000);
+          let utcString = dateObj.toUTCString();
+          const time = utcString.replace("GMT", "UTC"); // Format the date string
+
+
+
           
           console.log(log.args)
           return {
@@ -112,6 +119,7 @@ export default function DBChangeLogs() {
             rowId: rowId.toString(),
             dataHash,
             data,
+            time
           };
         });
 
@@ -138,6 +146,7 @@ export default function DBChangeLogs() {
             {logs.map((log, idx) => (
               <div key={idx} style={styles.logItem}>
                 <div style={styles.logCard}>
+                  <p>{log.time}</p>
                   <p style={styles.logText}>
                     <span style={styles.semibold}>Operation:</span> {log.operation}
                   </p>
