@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run bun server.ts in the background
-bun server.ts &
+bun run --bun server.ts &
 
 # Navigate to the frontend directory and start the React app in the background
 cd FRONTEND-react && bun start &

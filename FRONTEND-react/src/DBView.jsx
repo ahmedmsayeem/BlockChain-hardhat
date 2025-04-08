@@ -25,12 +25,25 @@ function DBView() {
 
   const createUser = async () => {
     try {
+      if (window.ethereum) {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        if (accounts && accounts.length > 0) {
+          alert(`MetaMask Account: ${accounts[0]}`);
+        } else {
+          alert("No accounts found in MetaMask.");
+          return;
+        }
+      } else {
+        alert("MetaMask is not installed.");
+        return;
+      }
+
       await axios.post(`${apiUrl}/users`, { name, email });
       setName("");
       setEmail("");
       fetchUsers();
       window.location.reload(); // Refresh the page
-    } catch (error) { 
+    } catch (error) {
       console.error("Error creating user:", error);
     }
   };
