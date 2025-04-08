@@ -88,7 +88,8 @@ app.post("/execute-commands", async (req: Request, res: Response) => {
 // CRUD operations
 app.post("/users", async (req: Request, res: Response) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, account } = req.body;
+    console.log("metamsk",account);
     const newId = await dbAction("INSERT", "users", { name, email });
     res.status(201).json({ id: newId, message: "User created successfully" });
   } catch (error) {
@@ -99,6 +100,8 @@ app.post("/users", async (req: Request, res: Response) => {
 
 app.get("/users", async (req: Request, res: Response) => {
   try {
+    // const { name, email, account } = req.body;
+    // console.log("metamsk",account);
     const users = await dbAction("SELECT", "users");
     res.json(users);
   } catch (error) {
@@ -110,6 +113,8 @@ app.get("/users", async (req: Request, res: Response) => {
 app.get("/users/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { name, email, account } = req.body;
+    console.log("metamsk",account);
     const users = await dbAction("SELECT", "users");
     const user = users.find((user: any) => user.id === parseInt(id));
     if (user) {
@@ -126,7 +131,8 @@ app.get("/users/:id", async (req: Request, res: Response) => {
 app.put("/users/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, email } = req.body;
+    const { name, email, account } = req.body;
+    console.log("metamsk",account);
     await dbAction("UPDATE", "users", { name, email }, parseInt(id));
     res.json({ message: "User updated successfully" });
   } catch (error) {
@@ -138,6 +144,8 @@ app.put("/users/:id", async (req: Request, res: Response) => {
 app.delete("/users/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { account } = req.body;
+     console.log("metamsk",account);
     await dbAction("DELETE", "users", {}, parseInt(id));
     res.json({ message: "User deleted successfully" });
   } catch (error) {

@@ -28,9 +28,7 @@ function DBView() {
       try {
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         if (accounts && accounts.length > 0) {
-          console.log("MetaMask Account:", accounts[0]);
           alert(`MetaMask Account: ${accounts[0]}`);
-          window.location.reload();
           return accounts[0];
         } else {
           alert("No accounts found in MetaMask.");
@@ -52,11 +50,11 @@ function DBView() {
       const account = await getMetaMaskAccount();
       if (!account) return;
 
-      await axios.post(`${apiUrl}/users`, { name, email });
+      await axios.post(`${apiUrl}/users`, { name, email, account: account }); // Send account
       setName("");
       setEmail("");
       fetchUsers();
-      
+      window.location.reload(); // Refresh the page
     } catch (error) {
       console.error("Error creating user:", error);
     }
@@ -67,8 +65,9 @@ function DBView() {
     try {
       const account = await getMetaMaskAccount();
       if (!account) return;
+      console.log("Account:",  account);
 
-      await axios.put(`${apiUrl}/users/${selectedUserId}`, { name, email });
+      await axios.put(`${apiUrl}/users/${selectedUserId}`, { name, email, account: account }); // Send account
       setName("");
       setEmail("");
       setSelectedUserId(null);
@@ -85,7 +84,7 @@ function DBView() {
       const account = await getMetaMaskAccount();
       if (!account) return;
 
-      await axios.delete(`${apiUrl}/users/${id}`);
+      await axios.delete(`${apiUrl}/users/${id}`, { data: { account: account } });
       fetchUsers();
       window.location.reload(); // Refresh the page
     } catch (error) {
