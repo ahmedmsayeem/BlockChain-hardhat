@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Remove artifacts and cache folders
+rm -rf artifacts
+rm -rf cache
+
 # Compile the smart contract
 bunx hardhat compile
 
