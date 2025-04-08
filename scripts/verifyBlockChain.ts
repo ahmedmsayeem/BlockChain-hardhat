@@ -25,12 +25,13 @@ async function getLogs() {
 
   console.log(`\n🧾 Found ${logs.length} logs:\n`);
   for (const log of logs) {
-
+    // console.log(log.args)
     const { operation, table, rowId, dataHash } = log.args;
     console.log(`🔹 Operation: ${operation}`);
     console.log(`📦 Table: ${log.args[1]}`);
     console.log(`🆔 Row ID: ${rowId}`);
     console.log(`🔐 Hash: ${dataHash}`);
+    console.log(`📜 Data: ${log.args[4]}`);
     console.log("-----------------------------");
     // console.log(log.args);
   }

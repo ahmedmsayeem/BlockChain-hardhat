@@ -1,45 +1,41 @@
 "use client";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import LoggerABI from "./DBLogger.json"; // Adjust the path if needed
+import LoggerABI from "./DBLogger.json"; // Update path if needed
 
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Replace with actual address if different
 
-// Define CSS styles as JavaScript objects
+// Styles
 const styles = {
   container: {
     fontFamily: "monospace",
-    backgroundColor: "#f3f4f6", // gray-100
+    backgroundColor: "#f3f4f6",
     minHeight: "100vh",
-    paddingTop: "3rem",
-    paddingBottom: "3rem",
-    paddingLeft: "1rem",
-    paddingRight: "1rem",
+    padding: "3rem 1rem",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
   },
   maxWidthContainer: {
-    maxWidth: "48rem", // max-w-3xl
-    marginLeft: "auto",
-    marginRight: "auto",
+    maxWidth: "48rem",
     width: "100%",
+    margin: "0 auto",
   },
   title: {
-    fontSize: "1.875rem", // text-3xl
+    fontSize: "1.875rem",
     fontWeight: "bold",
-    marginBottom: "1.5rem", // mb-6
+    marginBottom: "1.5rem",
     textAlign: "center",
-    color: "#374151", // gray-800
+    color: "#374151",
   },
   subtitle: {
     textAlign: "center",
-    marginBottom: "2rem", // mb-8
-    fontSize: "0.875rem", // text-sm
-    color: "#4b5563", // gray-600
+    marginBottom: "2rem",
+    fontSize: "0.875rem",
+    color: "#4b5563",
   },
   status: {
-    marginBottom: "2rem", // mb-8
+    marginBottom: "2rem",
     textAlign: "center",
   },
   logContainer: {
@@ -48,34 +44,35 @@ const styles = {
   },
   logItem: {
     position: "relative",
-    marginBottom: "3rem", // mb-12
+    marginBottom: "3rem",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
   },
   logCard: {
-    backgroundColor: "#fff", // white
-    border: "1px solid #e5e7eb", // gray-200
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    borderRadius: "0.75rem", // rounded-xl
-    padding: "1.5rem", // p-6
+    backgroundColor: "#fff",
+    border: "1px solid #e5e7eb",
+    boxShadow:
+      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    borderRadius: "0.75rem",
+    padding: "1.5rem",
     width: "100%",
-    maxWidth: "32rem", // max-w-lg
+    maxWidth: "32rem",
     textAlign: "center",
   },
   logText: {
-    color: "#4b5563", // gray-700
+    color: "#4b5563",
     marginBottom: "0.5rem",
   },
   connectorLine: {
-    width: "0.0625rem", // w-1
-    height: "2rem", // h-8
-    backgroundColor: "#d1d5db", // gray-300
+    width: "0.0625rem",
+    height: "2rem",
+    backgroundColor: "#d1d5db",
     borderRadius: "9999px",
   },
   connectorArrow: {
-    color: "#9ca3af", // gray-400
-    fontSize: "1.5rem", // text-2xl
+    color: "#9ca3af",
+    fontSize: "1.5rem",
   },
   semibold: {
     fontWeight: "600",
@@ -101,16 +98,32 @@ export default function DBChangeLogs() {
         }
 
         const parsedLogs = events.map((log) => {
-          const { operation, table, rowId, dataHash } = log.args;
+          // const { operation, table, rowId, dataHash, data } = log.args;
+          const operation = log.args[0];
+          const table = log.args[1];
+          const rowId = log.args[2];
+          const dataHash = log.args[3];
+          const data = log.args[4];
+          const unixTime = log.args[5].toString(); // Convert BigNumber to string
+          let dateObj = new Date(unixTime * 1000);
+          let utcString = dateObj.toUTCString();
+          const time = utcString.replace("GMT", "UTC"); // Format the date string
+
+
+
+          
+          console.log(log.args)
           return {
             operation,
             table,
             rowId: rowId.toString(),
             dataHash,
+            data,
+            time
           };
         });
 
-        setLogs(parsedLogs.reverse()); // Most recent first
+        setLogs(parsedLogs.reverse());
         setStatus(`Fetched ${parsedLogs.length} logs ✅`);
       } catch (err) {
         console.error("Error fetching logs:", err);
@@ -133,6 +146,7 @@ export default function DBChangeLogs() {
             {logs.map((log, idx) => (
               <div key={idx} style={styles.logItem}>
                 <div style={styles.logCard}>
+                  <p>{log.time}</p>
                   <p style={styles.logText}>
                     <span style={styles.semibold}>Operation:</span> {log.operation}
                   </p>
@@ -144,6 +158,22 @@ export default function DBChangeLogs() {
                   </p>
                   <p style={styles.logText}>
                     <span style={styles.semibold}>Data Hash:</span> {log.dataHash}
+                  </p>
+                  <p style={styles.logText}>
+                    <span style={styles.semibold}>Data:</span>
+                    <pre
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        textAlign: "left",
+                        marginTop: "0.5rem",
+                        color: "#1f2937",
+                        backgroundColor: "#f9fafb",
+                        padding: "0.5rem",
+                        borderRadius: "0.5rem",
+                      }}
+                    >
+                      {JSON.stringify(JSON.parse(log.data), null, 2)}
+                    </pre>
                   </p>
                 </div>
                 {idx !== logs.length - 1 && (
