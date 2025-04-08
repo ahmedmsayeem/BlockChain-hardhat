@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import LoggerABI from "./DBLogger.json"; // Update path if needed
 import { generateSQLCommandsFromLogs } from "./utils";
+import axios from "axios"; // Import axios
 
 const CONTRACT_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"; // Replace with actual address if different
 
@@ -137,11 +138,23 @@ export default function DBChangeLogs() {
     fetchLogs();
   }, []);
 
-  const handleLogClick = (blockNumber) => {
+  const handleLogClick = async (blockNumber) => {
     setSelectedBlock(blockNumber);
     const filteredLogs = logs.filter((log) => log.blockNumber <= blockNumber);
     const sqlCommands = generateSQLCommandsFromLogs(filteredLogs);
     setGeneratedSql(sqlCommands.join("\n"));
+
+    try {
+      // Call the /execute-commands endpoint
+      await axios.post("http://localhost:4000/execute-commands", {
+        commands: sqlCommands,
+      });
+      console.log("Commands executed successfully on the server");
+      alert("Commands executed successfully on the server"); // Optional: Provide user feedback
+    } catch (error) {
+      console.error("Error executing commands on the server:", error);
+      alert(`Error executing commands on the server: ${error}`); // Optional: Provide user feedback
+    }
   };
 
   return (
@@ -152,6 +165,25 @@ export default function DBChangeLogs() {
           Chronological order (most recent first)
         </p>
         <p style={styles.status}>{status}</p>
+        {selectedBlock && (
+          <div>
+            <h3>SQL Commands up to Block {selectedBlock}</h3>
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                textAlign: "left",
+                marginTop: "0.5rem",
+                color: "#1f2937",
+                backgroundColor: "#f9fafb",
+                padding: "0.5rem",
+                borderRadius: "0.5rem",
+              }}
+            >
+              {generatedSql}
+            </pre>
+          </div>
+        )}
+        <br /><br />
 
         {logs.length > 0 && (
           <div style={styles.logContainer}>
@@ -207,30 +239,13 @@ export default function DBChangeLogs() {
                     <div style={styles.connectorArrow}>↓</div>
                   </div>
                 ) : null}
-                )}
+                
               </div>
             ))}
           </div>
         )}
 
-        {selectedBlock && (
-          <div>
-            <h3>SQL Commands up to Block {selectedBlock}</h3>
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                textAlign: "left",
-                marginTop: "0.5rem",
-                color: "#1f2937",
-                backgroundColor: "#f9fafb",
-                padding: "0.5rem",
-                borderRadius: "0.5rem",
-              }}
-            >
-              {generatedSql}
-            </pre>
-          </div>
-        )}
+        
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ const port = 4000;
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
-// Database setup
+// Database setup - mydb.sqlite for existing CRUD operations
 const dbPromise = open({
   filename: "./mydb.sqlite",
   driver: sqlite3.Database,
@@ -30,6 +30,60 @@ app.use(async (req, res, next) => {
   }
 });
 
+// New endpoint to execute a list of SQL commands - secondDb.sqlite
+app.post("/execute-commands", async (req: Request, res: Response) => {
+  const commands: string[] = req.body.commands;
+
+  if (!Array.isArray(commands)) {
+    return res.status(400).send("Invalid request body: commands must be an array of strings.");
+  }
+
+  let secondDb;
+  try {
+    secondDb = await open({
+      filename: "./secondDb.sqlite",
+      driver: sqlite3.Database,
+    });
+
+    // Reset the database: drop and recreate the `users` table
+    await secondDb.exec(`
+      DROP TABLE IF EXISTS users;
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL
+      );
+    `);
+
+    const results: { command: string; status: string; error?: string }[] = [];
+
+    // Reverse the order of the commands
+    const reversedCommands = commands.slice().reverse();
+
+    for (const command of reversedCommands) {
+      try {
+        await secondDb.exec(command);
+        results.push({ command, status: "success" });
+      } catch (error: any) {
+        console.error(`Error executing: ${command}`, error.message);
+        results.push({ command, status: "error", error: error.message });
+        continue; // skip to next command
+      }
+    }
+
+    res.status(200).json({
+      message: "Executed all commands with success/error tracking.",
+      results,
+    });
+  } catch (error) {
+    console.error("Failed to open secondDb:", error);
+    res.status(500).send(`Failed to open secondDb: ${error}`);
+  } finally {
+    if (secondDb) {
+      await secondDb.close();
+    }
+  }
+});
 // CRUD operations
 app.post("/users", async (req: Request, res: Response) => {
   try {
