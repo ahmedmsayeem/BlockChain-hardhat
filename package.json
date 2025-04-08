@@ -1,11 +1,12 @@
 {
   "name": "blockchain",
   "module": "index.ts",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "latest",
+    "@types/cors": "^2.8.17",
     "hardhat": "^2.22.19"
   },
   "peerDependencies": {
@@ -22,5 +23,6 @@
     "prebuild": "^13.0.1",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
-  }
+  },
+  "private": true
 }
