@@ -4,11 +4,12 @@ import { ethers } from "ethers";
 import LoggerABI from "./DBLogger.json"; // Update path if needed
 import { generateSQLCommandsFromLogs } from "./utils";
 import axios from "axios"; // Import axios
+import styles from "./DBChanges.module.css"; // Import CSS module
 
 const CONTRACT_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"; // Replace with actual address if different
 
 // Styles
-const styles = {
+const inlineStyles = {
   container: {
     fontFamily: "monospace",
     backgroundColor: "#f3f4f6",
@@ -86,6 +87,7 @@ export default function DBChangeLogs() {
   const [status, setStatus] = useState("Fetching logs...");
   const [selectedBlock, setSelectedBlock] = useState(null);
   const [generatedSql, setGeneratedSql] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -144,27 +146,40 @@ export default function DBChangeLogs() {
     const sqlCommands = generateSQLCommandsFromLogs(filteredLogs);
     setGeneratedSql(sqlCommands.join("\n"));
 
-    try {
-      // Call the /execute-commands endpoint
-      await axios.post("http://localhost:4000/execute-commands", {
-        commands: sqlCommands,
-      });
-      console.log("Commands executed successfully on the server");
-      alert("Commands executed successfully on the server"); // Optional: Provide user feedback
-    } catch (error) {
-      console.error("Error executing commands on the server:", error);
-      alert(`Error executing commands on the server: ${error}`); // Optional: Provide user feedback
+    const confirmation = window.confirm(
+      `Want to see Snapshot of DB @ Block${blockNumber}?`
+    );
+
+    if (confirmation) {
+      try {
+        // Call the /execute-commands endpoint
+        const response = await axios.post(
+          "http://localhost:4000/execute-commands",
+          {
+            commands: sqlCommands,
+          }
+        );
+        console.log("Commands executed successfully on the server");
+        // alert("Commands executed successfully on the server"); // Optional: Provide user feedback
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 3000); // Hide after 3 seconds
+      } catch (error) {
+        console.error("Error executing commands on the server:", error);
+        alert(`Error executing commands on the server: ${error}`); // Optional: Provide user feedback
+      }
+    } else {
+      alert("Execution cancelled.");
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.maxWidthContainer}>
-        <h2 style={styles.title}>📄 DB Change Logs</h2>
-        <p style={styles.subtitle}>
+    <div style={inlineStyles.container}>
+      <div style={inlineStyles.maxWidthContainer}>
+        <h2 style={inlineStyles.title}>📄 DB Change Logs</h2>
+        <p style={inlineStyles.subtitle}>
           Chronological order (most recent first)
         </p>
-        <p style={styles.status}>{status}</p>
+        <p style={inlineStyles.status}>{status}</p>
         {selectedBlock && (
           <div>
             <h3>SQL Commands up to Block {selectedBlock}</h3>
@@ -186,32 +201,32 @@ export default function DBChangeLogs() {
         <br /><br />
 
         {logs.length > 0 && (
-          <div style={styles.logContainer}>
+          <div style={inlineStyles.logContainer}>
             {logs.map((log, idx) => (
               <div
                 key={idx}
-                style={styles.logItem}
+                style={inlineStyles.logItem}
                 onClick={() => handleLogClick(log.blockNumber)} // Add click handler
               >
-                <div style={styles.logCard}>
+                <div style={inlineStyles.logCard}>
                   <p>Block: {log.blockNumber}</p> {/* Display block number */}
                   <p>{log.time}</p>
-                  <p style={styles.logText}></p>
-                    <span style={styles.semibold}>Operation:</span>{" "}
+                  <p style={inlineStyles.logText}></p>
+                    <span style={inlineStyles.semibold}>Operation:</span>{" "}
                     {log.operation}
                  <p> </p>
-                  <p style={styles.logText}>
-                    <span style={styles.semibold}>Table:</span> {log.table}
+                  <p style={inlineStyles.logText}>
+                    <span style={inlineStyles.semibold}>Table:</span> {log.table}
                   </p>
-                  <p style={styles.logText}>
-                    <span style={styles.semibold}>Row ID:</span> {log.rowId}
+                  <p style={inlineStyles.logText}>
+                    <span style={inlineStyles.semibold}>Row ID:</span> {log.rowId}
                   </p>
-                  <p style={styles.logText}>
-                    <span style={styles.semibold}>Data Hash:</span>{" "}
+                  <p style={inlineStyles.logText}>
+                    <span style={inlineStyles.semibold}>Data Hash:</span>{" "}
                     {log.dataHash}
                   </p>
-                  <p style={styles.logText}>
-                    <span style={styles.semibold}>Data:</span>
+                  <p style={inlineStyles.logText}>
+                    <span style={inlineStyles.semibold}>Data:</span>
                     <pre
                       style={{
                         whiteSpace: "pre-wrap",
@@ -235,8 +250,8 @@ export default function DBChangeLogs() {
                       alignItems: "center",
                     }}
                   >
-                    <div style={styles.connectorLine}></div>
-                    <div style={styles.connectorArrow}>↓</div>
+                    <div style={inlineStyles.connectorLine}></div>
+                    <div style={inlineStyles.connectorArrow}>↓</div>
                   </div>
                 ) : null}
                 
@@ -245,6 +260,9 @@ export default function DBChangeLogs() {
           </div>
         )}
 
+        {showNotification && (
+          <div className={styles.notification}>✅ Database Updated</div>
+        )}
         
       </div>
     </div>
