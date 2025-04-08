@@ -50,7 +50,8 @@ export async function dbAction(
       throw new Error("Failed to retrieve the last inserted ID.");
     }
 
-    const jsonString = JSON.stringify(rowData);
+    const sqlCommand = `INSERT INTO ${table} (${keys.join(", ")}) VALUES (${placeholders})`;
+    const jsonString = JSON.stringify({sql: sqlCommand, values: values});
     const dataHash = ethers.id(jsonString);
 
     await logger.logChange("INSERT", table, newId.toString(), dataHash, jsonString);
@@ -70,7 +71,8 @@ export async function dbAction(
     );
     await stmt.run([...values, rowId]);
 
-    const jsonString = JSON.stringify(rowData);
+    const sqlCommand = `UPDATE ${table} SET ${setClause} WHERE id = ?`;
+    const jsonString = JSON.stringify({sql: sqlCommand, values: [...values, rowId]});
     const dataHash = ethers.id(jsonString);
 
     await logger.logChange("UPDATE", table, rowId.toString(), dataHash, jsonString);
@@ -81,11 +83,12 @@ export async function dbAction(
   if (action === "DELETE") {
     if (!rowId) throw new Error("DELETE requires rowId");
 
-    const stmt = await db.prepare(`DELETE FROM ${table} WHERE id = ?`);
+    const sqlCommand = `DELETE FROM ${table} WHERE id = ?`;
+    const stmt = await db.prepare(sqlCommand); // Use the sqlCommand here
     await stmt.run([rowId]);
 
-    const deletePlaceholder = JSON.stringify({ command: `DELETE FROM ${table} WHERE id = ?` });
-    const dataHash = ethers.id("DELETED");
+    const deletePlaceholder = JSON.stringify({sql: sqlCommand, values: [rowId]});
+    const dataHash = ethers.id(deletePlaceholder);
 
     await logger.logChange("DELETE", table, rowId.toString(), dataHash, deletePlaceholder);
     console.log(`🗑️ DELETED ${table} ID ${rowId}`);
@@ -108,9 +111,9 @@ export async function dbAction(
 
 
 
-await dbAction("UPDATE", "users", {
-  name: "POTATO TOMATO"
-}, 1);
+// await dbAction("UPDATE", "users", {
+//   name: "POTATO TOMATO"
+// }, 1);
 
 
 // await dbAction("DELETE", "users", {}, 1);
