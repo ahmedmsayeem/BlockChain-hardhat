@@ -6,7 +6,7 @@ import { generateSQLCommandsFromLogs } from "./utils";
 import axios from "axios"; // Import axios
 import styles from "./DBChanges.module.css"; // Import CSS module
 
-const CONTRACT_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"; // Replace with actual address if different
+const CONTRACT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; // Replace with actual address if different
 
 // Styles
 const inlineStyles = {
@@ -157,6 +157,12 @@ export default function DBChangeLogs() {
           "http://localhost:4000/execute-commands",
           {
             commands: sqlCommands,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*", //remove this in production
+            },
           }
         );
         console.log("Commands executed successfully on the server");

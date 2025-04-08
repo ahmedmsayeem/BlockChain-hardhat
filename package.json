@@ -1,7 +1,7 @@
 {
   "name": "blockchain",
   "module": "index.ts",
-  "type": "module",
+  "type": "commonjs",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@types/better-sqlite3": "^7.6.13",
