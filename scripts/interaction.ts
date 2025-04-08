@@ -26,7 +26,7 @@ const logger = new ethers.Contract(
 );
 
 // Main unified CRUD function
-async function dbAction(
+export async function dbAction(
   action: "INSERT" | "UPDATE" | "DELETE" | "SELECT",
   table: string,
   rowData: Record<string, any> = {},
@@ -102,15 +102,15 @@ async function dbAction(
 // Example call
 
 // await dbAction("INSERT", "users", {
-//   name: "Joe MAMA",
+//   name: "Sayeem Ahmed",
 //   email: "joe.mama@example.com"
 // });
 
 
 
-// await dbAction("UPDATE", "users", {
-//   name: "POTATO TOMATO"
-// }, 1);
+await dbAction("UPDATE", "users", {
+  name: "POTATO TOMATO"
+}, 1);
 
 
-await dbAction("DELETE", "users", {}, 1);
+// await dbAction("DELETE", "users", {}, 1);

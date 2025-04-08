@@ -12,10 +12,13 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@types/express": "^5.0.1",
     "@types/sqlite3": "^5.1.0",
     "better-sqlite3": "^11.9.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "ethers": "^6.13.5",
+    "express": "^5.1.0",
     "prebuild": "^13.0.1",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
